@@ -8,7 +8,7 @@ Let us start withthe code
 
 ### Step 1: 
 - Initialise the replay buffer wiht "n" random records
-![image](/images/replay_buffer.jpg)
+![image](images/replay_buffer.jpg)
 ```python
 class ReplayBuffer(object):
     def __init__(self, max_size = 1e6):
