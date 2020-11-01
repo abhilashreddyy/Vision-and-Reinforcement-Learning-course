@@ -61,13 +61,13 @@ class Actor(nn.Module):
 
 ```
 - Each actor model structure is as following image
-![image](/images/actor.jpg)
+![image](images/actor.jpg)
 
 ### Step 3:
 - Initialise Critic models and critic targets
 - In our case we took 2 - Critic Models and 2 corresponding Critic Targets\
 \
-![image](/images/step3.jpg)
+![image](images/step3.jpg)
 ```python
 class Critic(nn.Module):
     def __init__(self, state_dims, action_dims):
@@ -101,7 +101,7 @@ class Critic(nn.Module):
 
 ```
 - Each Critic model Structure is as following image
-![image](/images/critic.jpg)
+![image](images/critic.jpg)
 ### initialization step before step 4:
 ```python
 class T3D(object):
@@ -138,7 +138,7 @@ def train(self, replay_buffer, iterations, batch_size = 100, discount = 0.99, ta
 ### Step 5:
 - Predict Target for next action trough Actor Target\
   \
-![image](/images/step5.jpg)
+![image](images/step5.jpg)
 ```python
     next_action = self.actor_target.forward(next_state)
 ```
@@ -154,7 +154,7 @@ def train(self, replay_buffer, iterations, batch_size = 100, discount = 0.99, ta
 ### Step 7:
 - Predict Q values to the next state and next action from the critic Target\
   \
-![image](/images/Step7.jpg)
+![image](images/Step7.jpg)
 ```python
     target_Q1, target_Q2 = self.critic_target.forward(next_state, next_action)
 ```
@@ -163,7 +163,7 @@ def train(self, replay_buffer, iterations, batch_size = 100, discount = 0.99, ta
 - Calculate minimum Q value from all the critic targets
 - This prevents too optmistic estimates of the value of next states\
   \
-![image](/images/step8.jpg)
+![image](images/step8.jpg)
 ```python
     target_Q = torch.min(target_Q1, target_Q2)
 ```
@@ -174,8 +174,8 @@ def train(self, replay_buffer, iterations, batch_size = 100, discount = 0.99, ta
 - If we observe the above step carefully it is Bellmen ford equation we are using to rain the agent
 - Observe the following diagram and formula and compare it with what is happening in current step\
   \
-![image](/images/recapf.PNG)
-![image](/images/recapi.PNG)
+![image](images/recapf.PNG)
+![image](images/recapi.PNG)
 ```python
     target_Q = reward + ((1 - done) * discount * target_Q).detach()
 ```
@@ -183,7 +183,7 @@ def train(self, replay_buffer, iterations, batch_size = 100, discount = 0.99, ta
 ### Step 10:
 - Calculate Critic model current Q-values from current state and action \
   \
-![image](/images/Step10.jpg)
+![image](images/Step10.jpg)
 ```python
     current_Q1, current_Q2 = self.critic.forward(state, action)
 ```
@@ -192,7 +192,7 @@ def train(self, replay_buffer, iterations, batch_size = 100, discount = 0.99, ta
 - Now as we have already calculated current steps expected Max Q-value from step 9 we can calculate Loss for the Critic model just by calculating difference between Q calculated in step 9(Target Q-value) and step 10(Current Q-value) as shown in figure.
 - here MSE() refers to mean square error
   \
-![image](/images/Step11.jpg)
+![image](images/Step11.jpg)
 ```python
     critic_loss = F.mse_loss(current_Q1, target_Q) + F.mse_loss(current_Q2, target_Q)
 ```
@@ -200,7 +200,7 @@ def train(self, replay_buffer, iterations, batch_size = 100, discount = 0.99, ta
 ### Step 12:
 - Back propagate all the Ctitic models from the loss calculated in step 11\
   \
-![image](/images/Step12.jpg)
+![image](images/Step12.jpg)
 ```python
     self.critic_optmizer.zero_grad()
     critic_loss.backward()
@@ -211,7 +211,7 @@ def train(self, replay_buffer, iterations, batch_size = 100, discount = 0.99, ta
 - repeat step 4-12 for policy_freq nouber of iterations
 - After every policy_freq number of iterations, backpropagate Actor model using the loss calculated from critic model as shown below
   \
-![image](/images/Step13_1.jpg)
+![image](images/Step13_1.jpg)
 ```python
 if it % policy_freq == 0:
     actor_loss = -(self.critic.Q1(state, self.actor(state)).mean())
@@ -222,7 +222,7 @@ if it % policy_freq == 0:
   -------------------------------------------------------------------------------------------------------------------------\
   \
   
-![image](/images/Step13_2.jpg)
+![image](images/Step13_2.jpg)
 ```python
     self.actor_optimizer.grad_zero()
     actor_loss.backward()
@@ -233,7 +233,7 @@ if it % policy_freq == 0:
 - Update weights of actor and critic target models using poliyak averaging
 - tetha' = tou * tetha + (1 - tou) * tetha' \
   \
-![image](/images/step14.jpg)
+![image](images/step14.jpg)
 ```python
     for param, target_param in zip(self.actor.parameters(), self.actor_target.parameters()):
         target_param.data.copy_(tau * param.data + (1 - tau) * target_param.data)
